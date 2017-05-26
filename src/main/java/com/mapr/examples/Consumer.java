@@ -16,10 +16,7 @@ import java.util.Properties;
 import java.util.Random;
 
 /**
- * This program reads messages from two topics. Messages on "fast-messages" are analyzed
- * to estimate latency (assuming clock synchronization between producer and consumer).
- * <p/>
- * Whenever a message is received on "slow-messages", the stats are dumped.
+ * This program reads messages from topics "SN_Transformer_env" 
  */
 public class Consumer {
     public static void main(String[] args) throws IOException {
@@ -28,8 +25,7 @@ public class Consumer {
         Histogram stats = new Histogram(1, 10000000, 2);
         Histogram global = new Histogram(1, 10000000, 2);
 
-        final String TOPIC_FAST_MESSAGES = "/sample-stream:fast-messages";
-        final String TOPIC_SUMMARY_MARKERS = "/sample-stream:summary-markers";
+        final String TOPIC_SN_Transformer_env = "/statnett-stream:SN_Transformer_env";
 
         // and the consumer
         KafkaConsumer<String, String> consumer;
@@ -42,7 +38,7 @@ public class Consumer {
 
             consumer = new KafkaConsumer<>(properties);
         }
-        consumer.subscribe(Arrays.asList(TOPIC_FAST_MESSAGES, TOPIC_SUMMARY_MARKERS));
+        consumer.subscribe(Arrays.asList(TOPIC_SN_Transformer_env));
         int timeouts = 0;
         //noinspection InfiniteLoopStatement
         while (true) {
@@ -56,7 +52,7 @@ public class Consumer {
             }
             for (ConsumerRecord<String, String> record : records) {
                 switch (record.topic()) {
-                    case TOPIC_FAST_MESSAGES:
+                    case TOPIC_SN_Transformer_env:
                         // the send time is encoded inside the message
                         JsonNode msg = mapper.readTree(record.value());
                         switch (msg.get("type").asText()) {
